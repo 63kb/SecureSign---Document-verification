@@ -5,15 +5,17 @@ namespace DataAccess.models
 {
     public class Document
     {
-        [Key]
         public int Id { get; set; }
 
+        [Required]
         public string FileName { get; set; }
 
-        public string FileType { get; set; }
+        public string ContentType { get; set; }
 
-        public string FilePath { get; set; }
+        public long Size { get; set; }
 
-        public DateTime UploadedAt { get; set; } = DateTime.Now;
+        public byte[] Content { get; set; }
+
+        public DateTime UploadDate { get; set; } = DateTime.UtcNow;
     }
 }

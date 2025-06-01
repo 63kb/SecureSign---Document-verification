@@ -11,5 +11,12 @@ namespace DataAccess
         }
 
         public DbSet<Document> Documents { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Document>()
+                .Property(d => d.UploadDate)
+                .HasDefaultValueSql("GETUTCDATE()");
+        }
     }
 }
