@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36121.58
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "docsupload", "docsupload\docsupload.csproj", "{F23FAAAC-DD9B-465B-AA21-95F8DFED534E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Api", "Core.Api\Core.Api.csproj", "{01B0F5B4-4D09-4FEB-A74B-89DDBF8B285C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{2285D8D9-322C-4F68-B0EE-14518603ABC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentUpload.Client", "DocumentUpload.Client\DocumentUpload.Client.csproj", "{792F2645-AC21-49C9-8125-310A3DE82926}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F23FAAAC-DD9B-465B-AA21-95F8DFED534E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F23FAAAC-DD9B-465B-AA21-95F8DFED534E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F23FAAAC-DD9B-465B-AA21-95F8DFED534E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F23FAAAC-DD9B-465B-AA21-95F8DFED534E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{01B0F5B4-4D09-4FEB-A74B-89DDBF8B285C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{01B0F5B4-4D09-4FEB-A74B-89DDBF8B285C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01B0F5B4-4D09-4FEB-A74B-89DDBF8B285C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +23,10 @@ Global
 		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{792F2645-AC21-49C9-8125-310A3DE82926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{792F2645-AC21-49C9-8125-310A3DE82926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{792F2645-AC21-49C9-8125-310A3DE82926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{792F2645-AC21-49C9-8125-310A3DE82926}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

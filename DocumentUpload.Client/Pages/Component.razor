@@ -1,0 +1,16 @@
+@inject NavigationManager Navigation  
+<h1>Welcome to File Upload</h1>  
+<p>Navigate to the Upload page to submit your files.</p>  
+
+<button class="btn btn-primary" @onclick="NavigateToUpload">  
+    Go to Upload  
+</button>  
+
+@code {  
+
+    // Removed duplicate Navigation property to resolve CS0102 error
+    private void NavigateToUpload()  
+    {  
+        Navigation.NavigateTo("/upload");  
+    }  
+}

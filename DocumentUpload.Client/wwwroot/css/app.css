@@ -1,0 +1,158 @@
+:root {
+    --google-blue: #4285F4;
+    --google-red: #EA4335;
+    --google-yellow: #FBBC05;
+    --google-green: #34A853;
+    --google-gray: #F1F1F1;
+    --google-dark-gray: #5F6368;
+    --google-font: 'Roboto', Arial, sans-serif;
+}
+
+body {
+    font-family: var(--google-font);
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    color: #202124;
+    min-height: 100vh;
+}
+
+/* Google-style header */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 6px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.logo {
+    color: var(--google-blue);
+    font-size: 22px;
+    font-weight: 500;
+    margin-right: 15px;
+}
+
+/* Main container */
+.main-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Google-style card */
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
+    padding: 40px;
+    margin: 20px 0;
+}
+
+/* Upload area styles */
+.upload-area {
+    border: 2px dashed #dadce0;
+    border-radius: 8px;
+    padding: 40px 20px;
+    margin: 30px 0;
+    transition: all 0.3s;
+}
+
+    .upload-area:hover {
+        border-color: var(--google-blue);
+        background-color: #f8f9fa;
+    }
+
+/* Google-style button */
+.btn-google {
+    background-color: var(--google-blue);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .btn-google:hover {
+        background-color: #3367D6;
+        box-shadow: 0 1px 2px 0 rgba(66,133,244,0.3), 0 1px 3px 1px rgba(66,133,244,0.15);
+    }
+
+/* Input file style */
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: var(--google-gray);
+    color: var(--google-dark-gray);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .file-label:hover {
+        background-color: #e0e0e0;
+    }
+
+/* Status messages */
+.status-message {
+    margin: 20px 0;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.success {
+    background-color: #E6F4EA;
+    color: var(--google-green);
+}
+
+.error {
+    background-color: #FCE8E6;
+    color: var(--google-red);
+}
+
+/* Progress indicator */
+.progress-container {
+    margin: 20px 0;
+}
+
+.progress-bar {
+    height: 4px;
+    background-color: var(--google-gray);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--google-blue);
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* Results display */
+.result-card {
+    text-align: left;
+    padding: 16px;
+    margin-top: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.result-title {
+    font-weight: 500;
+    color: var(--google-dark-gray);
+    margin-bottom: 8px;
+}
+
+.result-value {
+    color: #202124;
+    font-size: 14px;
+}

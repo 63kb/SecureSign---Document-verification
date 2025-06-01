@@ -1,0 +1,102 @@
+﻿@page "/upload"
+@inject HttpClient Http
+@inject IJSRuntime JsRuntime
+
+<div class="upload-container">
+    <h2>File Upload</h2>
+
+    <InputFile class="form-control"
+               multiple="false"
+               OnChange="OnInputFileChange"
+               accept=".pdf,.doc,.docx,.jpg,.png" />
+
+    <button @onclick="UploadFile"
+            disabled="@(isUploading || selectedFile == null)"
+            class="btn btn-primary mt-3">
+        @if (isUploading)
+        {
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+            <span> Uploading...</span>
+        }
+        else
+        {
+            <span>Upload File</span>
+        }
+    </button>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert @alertClass mt-3">@message</div>
+    }
+
+    @if (uploadResult != null)
+    {
+        <div class="mt-3">
+            <h4>Upload Result</h4>
+            <p>File ID: @uploadResult.Id</p>
+            <p>File Name: @uploadResult.FileName</p>
+            <p>Size: @(uploadResult.Size / 1024) KB</p>
+        </div>
+    }
+</div>
+
+@code {
+    private IBrowserFile? selectedFile;
+    private bool isUploading = false;
+    private string message = string.Empty;
+    private string alertClass = "alert-info";
+    private UploadResult? uploadResult;
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        message = string.Empty;
+        uploadResult = null;
+    }
+
+    private async Task UploadFile()
+    {
+        if (selectedFile == null) return;
+
+        isUploading = true;
+        message = "Uploading file...";
+        alertClass = "alert-info";
+
+        try
+        {
+            using var content = new MultipartFormDataContent();
+            var stream = selectedFile.OpenReadStream(50 * 1024 * 1024); // 50MB max
+            content.Add(new StreamContent(stream), "file", selectedFile.Name);
+
+            var response = await Http.PostAsync("api/documents/upload", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                uploadResult = await response.Content.ReadFromJsonAsync<UploadResult>();
+                message = "File uploaded successfully!";
+                alertClass = "alert-success";
+            }
+            else
+            {
+                message = $"Error: {await response.Content.ReadAsStringAsync()}";
+                alertClass = "alert-danger";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Upload failed: {ex.Message}";
+            alertClass = "alert-danger";
+        }
+        finally
+        {
+            isUploading = false;
+        }
+    }
+
+    private class UploadResult
+    {
+        public int Id { get; set; }
+        public string FileName { get; set; } = string.Empty;
+        public long Size { get; set; }
+    }
+}
