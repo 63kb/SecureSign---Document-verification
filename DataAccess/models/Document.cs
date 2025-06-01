@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.Api.Models
+namespace DataAccess.models
 {
     public class Document
     {

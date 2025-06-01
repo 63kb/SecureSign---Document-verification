@@ -1,7 +1,7 @@
-﻿using Core.Api.Models;
+﻿using DataAccess.models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Core.Api
+namespace DataAccess
 {
     public class AppDbContext : DbContext
     {

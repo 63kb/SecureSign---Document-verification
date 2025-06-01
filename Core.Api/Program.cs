@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore; // Ensure this is included
 using Microsoft.Extensions.DependencyInjection; 
 using Core.Api;
+using DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 

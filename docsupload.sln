@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "docsupload", "docsupload\do
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Api", "Core.Api\Core.Api.csproj", "{01B0F5B4-4D09-4FEB-A74B-89DDBF8B285C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{2285D8D9-322C-4F68-B0EE-14518603ABC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{01B0F5B4-4D09-4FEB-A74B-89DDBF8B285C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01B0F5B4-4D09-4FEB-A74B-89DDBF8B285C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01B0F5B4-4D09-4FEB-A74B-89DDBF8B285C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
