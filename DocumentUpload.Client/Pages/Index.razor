@@ -1,10 +1,29 @@
-﻿@page "/"  
-@inject NavigationManager Navigation  
-<h1>Welcome to File Upload</h1>  
-<p>Navigate to the Upload page to submit your files.</p>  
+﻿@page "/"
+@inject NavigationManager Navigation
 
-<Component />  
+<div class="main-container">
+    <div class="card">
+        <h1>Welcome to File Upload</h1>
+        <p>Navigate to the Upload page to submit your files.</p>
 
-@code {  
-    // Removed duplicate property definition for Navigation  
+        <button class="btn-google" @onclick="NavigateToUpload">
+            Go to Upload Page
+        </button>
+
+        <div class="upload-area" style="margin-top: 20px; cursor: pointer;" @onclick="NavigateToUpload">
+            <div style="padding: 40px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="var(--google-blue)" style="margin-bottom: 16px;">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                <p>Click here or use the button above to upload files</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void NavigateToUpload()
+    {
+        Navigation.NavigateTo("/upload");
+    }
 }
