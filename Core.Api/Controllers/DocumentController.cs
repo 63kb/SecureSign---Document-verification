@@ -20,13 +20,13 @@ namespace Core.Api.Controllers
     {
         private readonly AppDbContext _context;
         private readonly ILogger<DocumentsController> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private const long MaxFileSize = 50 * 1024 * 1024; // 50MB limit
 
         public DocumentsController(
             AppDbContext context,
             ILogger<DocumentsController> logger,
-            UserManager<IdentityUser> userManager)
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _logger = logger;

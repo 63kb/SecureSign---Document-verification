@@ -1,14 +1,15 @@
 using DataAccess;
+using DataAccess.models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure; 
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.EntityFrameworkCore.Infrastructure; 
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DocumentDB")));
 
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -86,7 +87,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "Your API", Version = "v1" });
-
+    c.OperationFilter<SwaggerFileOperationFilter>();
     // Add JWT Authentication to Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -135,7 +136,7 @@ if (app.Environment.IsDevelopment())
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        db.Database.Migrate();
+        
         
     }
 }
@@ -150,3 +151,27 @@ app.UseAuthorization();
 app.MapControllers();
 Console.WriteLine("Application is running on: " + app.Urls.FirstOrDefault());
 app.Run();
+
+
+public class SwaggerFileOperationFilter : IOperationFilter
+{
+    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    {
+        var fileUploadMime = "multipart/form-data";
+        if (operation.RequestBody == null || !operation.RequestBody.Content.Any(x => x.Key.Equals(fileUploadMime, StringComparison.InvariantCultureIgnoreCase)))
+            return;
+
+        var fileParams = context.MethodInfo.GetParameters().Where(p => p.ParameterType == typeof(IFormFile));
+        if (fileParams.Any())
+        {
+            operation.RequestBody.Content[fileUploadMime].Schema.Properties =
+                fileParams.ToDictionary(
+                    k => k.Name,
+                    v => new OpenApiSchema()
+                    {
+                        Type = "string",
+                        Format = "binary"
+                    });
+        }
+    }
+}
