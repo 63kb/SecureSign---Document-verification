@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
+﻿using DataAccess.models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -27,7 +27,7 @@ public class Document
     public string UserId { get; set; } = string.Empty;
 
     [ForeignKey("UserId")]
-    public virtual IdentityUser User { get; set; } = null!;
+    public virtual ApplicationUser User { get; set; } = null!;
 
     public string Description { get; set; } = string.Empty;
 
