@@ -11,7 +11,6 @@ using System.Net.Mime;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-
 namespace Core.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -38,8 +37,8 @@ namespace Core.Api.Controllers
         [RequestSizeLimit(MaxFileSize)]
         [RequestFormLimits(MultipartBodyLengthLimit = MaxFileSize)]
         [SwaggerOperation(
-                Summary = "Upload a document",
-                Description = "Uploads a document with optional metadata",
+                Summary = "Upload a PDF document",
+                Description = "Uploads a PDF document with optional metadata",
                 OperationId = "UploadDocument")]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
@@ -60,29 +59,26 @@ namespace Core.Api.Controllers
                 if (file.Length > MaxFileSize)
                     return BadRequest($"File exceeds {MaxFileSize/1024/1024}MB limit");
 
-                var allowedTypes = new[] {
-                    "application/pdf",
-                    "image/jpeg",
-                    "image/png",
-                    "application/msword",
-                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                };
+                // Only allow PDF files
+                if (file.ContentType != "application/pdf")
+                    return BadRequest("Only PDF files are allowed");
 
-                if (!allowedTypes.Contains(file.ContentType))
-                    return BadRequest("Invalid file type");
-                var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx" };
                 var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-                if (!allowedExtensions.Contains(fileExtension))
+                if (fileExtension != ".pdf")
                 {
-                    return BadRequest("Invalid file extension");
+                    return BadRequest("Only .pdf files are allowed");
                 }
+
                 // Process file
                 using var memoryStream = new MemoryStream();
                 await file.CopyToAsync(memoryStream);
 
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userId))
+                    return Unauthorized();
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
                     return Unauthorized();
 
                 var document = new Document
@@ -92,7 +88,6 @@ namespace Core.Api.Controllers
                     Size = file.Length,
                     Content = memoryStream.ToArray(),
                     UserId = userId,
-                    User = await _userManager.FindByIdAsync(userId), // Fix: Set the required 'User' property
                     Description = description,
                     Category = category,
                     UploadDate = DateTime.UtcNow
@@ -118,6 +113,7 @@ namespace Core.Api.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
         [HttpGet("{id}/download")]
         public async Task<IActionResult> Download(int id)
         {
@@ -125,10 +121,7 @@ namespace Core.Api.Controllers
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var document = await _context.Documents
-                    .Include(d => d.Permissions)
-                    .FirstOrDefaultAsync(d => d.Id == id &&
-                        (d.UserId == userId ||
-                         d.Permissions.Any(p => p.UserId == userId)));
+                    .FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId);
 
                 if (document == null)
                 {
@@ -144,6 +137,7 @@ namespace Core.Api.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAllUserDocuments()
         {
@@ -152,8 +146,7 @@ namespace Core.Api.Controllers
                 return Unauthorized();
 
             var documents = await _context.Documents
-                .Where(d => d.UserId == userId ||
-                           d.Permissions.Any(p => p.UserId == userId))
+                .Where(d => d.UserId == userId)
                 .OrderByDescending(d => d.UploadDate)
                 .Select(d => new DocumentDto
                 {
@@ -163,52 +156,13 @@ namespace Core.Api.Controllers
                     Size = d.Size,
                     UploadDate = d.UploadDate,
                     Description = d.Description,
-                    Category = d.Category,
-                    IsOwner = d.UserId == userId // Add this to distinguish owned vs shared
+                    Category = d.Category
                 })
                 .ToListAsync();
 
             return Ok(documents);
         }
 
-        [HttpPost("{id}/share")]
-        public async Task<IActionResult> ShareDocument(
-    int id,
-    [FromBody] ShareRequest request)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var document = await _context.Documents
-                .FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId);
-
-            if (document == null) return NotFound();
-
-            // Check if permission already exists
-            var existingPermission = await _context.DocumentPermissions
-                .FirstOrDefaultAsync(p => p.DocumentId == id && p.UserId == request.TargetUserId);
-
-            if (existingPermission != null)
-            {
-                return BadRequest("Document is already shared with this user");
-            }
-
-            var permission = new DocumentPermission
-            {
-                DocumentId = id,
-                UserId = request.TargetUserId,
-                Document = document
-            };
-
-            _context.DocumentPermissions.Add(permission);
-            await _context.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        // DTO class (add to DataAccess/models)
-        public class ShareRequest
-        {
-            public required string TargetUserId { get; set; }
-        }
         [HttpGet("{id}/metadata")]
         public async Task<IActionResult> GetDocumentMetadata(int id)
         {
@@ -217,17 +171,18 @@ namespace Core.Api.Controllers
                 return Unauthorized();
 
             var document = await _context.Documents
-                .Include(d => d.User) // Ensure the User property is loaded
                 .FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId);
 
             if (document == null)
                 return NotFound();
 
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return Unauthorized();
+
             var metadata = new
             {
                 document.Id,
-                UserDetails = await _userManager.FindByIdAsync(userId)
-                       ?? throw new InvalidOperationException("User not found"), 
                 document.FileName,
                 document.ContentType,
                 document.Size,
@@ -236,9 +191,9 @@ namespace Core.Api.Controllers
                 document.Category,
                 User = new
                 {
-                    Id = document.User.Id,
-                    UserName = document.User.UserName,
-                    Email = document.User.Email
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email
                 }
             };
 
@@ -273,4 +228,6 @@ namespace Core.Api.Controllers
             }
         }
     }
+
+  
 }

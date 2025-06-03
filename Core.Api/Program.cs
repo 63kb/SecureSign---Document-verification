@@ -7,8 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.EntityFrameworkCore.Infrastructure; // Add this namespace for 'Database' property
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore; // Add this namespace for 'IdentityDbContext<>'
+using Microsoft.EntityFrameworkCore.Infrastructure; 
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,18 +85,39 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+    c.SwaggerDoc("v1", new() { Title = "Your API", Version = "v1" });
 
-    // Add IFormFile support
-    c.MapType<IFormFile>(() => new OpenApiSchema
+    // Add JWT Authentication to Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Type = "string",
-        Format = "binary"
+        Description = @"JWT Authorization header using the Bearer scheme.  
+                        Enter 'Bearer' [space] and then your token in the text input below.  
+                        Example: 'Bearer eyJhbGciOi...'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
     });
 
-    // Enable multipart file uploads
-    c.OperationFilter<FileUploadOperationFilter>();
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header
+            },
+            new List<string>()
+        }
+    });
 });
+
 
 builder.Services.AddLogging();
 builder.Services.AddControllers();
