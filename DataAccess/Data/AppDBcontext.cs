@@ -44,7 +44,7 @@ namespace DataAccess
             modelBuilder.Entity<Document>(entity =>
             {
                 entity.HasKey(d => d.Id); // Make sure you have a primary key
-                // Other configurations...
+                
             });
         }
     }

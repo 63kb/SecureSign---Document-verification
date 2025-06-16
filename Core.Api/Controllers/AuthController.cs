@@ -1,4 +1,5 @@
 ﻿using DataAccess.models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -51,27 +52,43 @@ public class AuthController : ControllerBase
         return Ok(new { Token = token });
     }
 
+    [HttpGet("validate")]
+    [Authorize]
+    public IActionResult ValidateToken()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var email = User.FindFirstValue(ClaimTypes.Email);
+
+        return Ok(new
+        {
+            UserId = userId,
+            Email = email,
+            Message = "Token is valid",
+            Claims = User.Claims.Select(c => new { c.Type, c.Value })
+        });
+    }
+
     private string GenerateJwtToken(ApplicationUser user)
     {
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
-        };
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id), // Use ID as subject
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Email, user.Email)
+    };
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiry = DateTime.Now.AddMinutes(
-            Convert.ToDouble(_configuration["Jwt:ExpiryInMinutes"]));
+        var expiry = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiryInMinutes"]));
 
         var token = new JwtSecurityToken(
-            _configuration["Jwt:Issuer"],
-            _configuration["Jwt:Audience"],
-            claims,
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
             expires: expiry,
-            signingCredentials: creds
+            signingCredentials: creds   
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);

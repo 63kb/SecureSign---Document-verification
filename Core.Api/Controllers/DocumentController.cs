@@ -21,7 +21,7 @@ namespace Core.Api.Controllers
         private readonly AppDbContext _context;
         private readonly ILogger<DocumentsController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        private const long MaxFileSize = 50 * 1024 * 1024; // 50MB limit
+        private const long MaxFileSize = 100 * 1024 * 1024; // 50MB limit
 
         public DocumentsController(
             AppDbContext context,
@@ -42,9 +42,6 @@ namespace Core.Api.Controllers
                 OperationId = "UploadDocument")]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(DocumentDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Upload(
             [FromForm] IFormFile file,
             [FromForm] string description = null,
@@ -52,16 +49,32 @@ namespace Core.Api.Controllers
         {
             try
             {
+                // Get user ID from JWT claims
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    _logger.LogWarning("Unauthorized upload attempt - no user ID in claims");
+                    return Unauthorized(new { Message = "Authentication required" });
+                }
+
+                // Validate user exists
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    _logger.LogWarning("Upload attempt by non-existent user {UserId}", userId);
+                    return Unauthorized(new { Message = "User not found" });
+                }
+
                 // Validation
                 if (file == null || file.Length == 0)
                     return BadRequest("No file provided");
 
                 if (file.Length > MaxFileSize)
-                    return BadRequest($"File exceeds {MaxFileSize/1024/1024}MB limit");
+                    return BadRequest($"File exceeds {MaxFileSize / 1024 / 1024}MB limit");
 
-                // Only allow PDF files
-                if (file.ContentType != "application/pdf")
-                    return BadRequest("Only PDF files are allowed");
+                var allowedContentTypes = new[] { "application/pdf", "text/plain" };
+                if (!allowedContentTypes.Contains(file.ContentType))
+                    return BadRequest("Invalid file type");
 
                 var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
                 if (fileExtension != ".pdf")
@@ -72,14 +85,6 @@ namespace Core.Api.Controllers
                 // Process file
                 using var memoryStream = new MemoryStream();
                 await file.CopyToAsync(memoryStream);
-
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userId))
-                    return Unauthorized();
-
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null)
-                    return Unauthorized();
 
                 var document = new Document
                 {
@@ -109,8 +114,8 @@ namespace Core.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error uploading document");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Error uploading document for user {UserId}", User.FindFirstValue(ClaimTypes.NameIdentifier));
+                return StatusCode(500, new { Message = "Internal server error" });
             }
         }
 

@@ -23,31 +23,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// Add Authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
- .AddJwtBearer(options =>
- {
-      var jwtKey = builder.Configuration["Jwt:Key"];
-      if (string.IsNullOrEmpty(jwtKey))
-      {
-          throw new InvalidOperationException("JWT Key is not configured in the application settings.");
-      }
-
-      options.TokenValidationParameters = new TokenValidationParameters
-      {
-          ValidateIssuer = true,
-          ValidateAudience = true,
-          ValidateLifetime = true,
-          ValidateIssuerSigningKey = true,
-          ValidIssuer = builder.Configuration["Jwt:Issuer"],
-          ValidAudience = builder.Configuration["Jwt:Audience"],
-          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-      };
- });
 
 
 builder.Services.Configure<IdentityOptions>(options =>
@@ -58,8 +33,18 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = true;
 });
 
+// In Program.cs, add validation:
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
 
-  
+if (string.IsNullOrEmpty(jwtKey))
+    throw new InvalidOperationException("JWT Key not configured");
+if (string.IsNullOrEmpty(jwtIssuer))
+    throw new InvalidOperationException("JWT Issuer not configured");
+if (string.IsNullOrEmpty(jwtAudience))
+    throw new InvalidOperationException("JWT Audience not configured");
+
 
 //this will limit the size of the file that can be uploaded to 50MB
 builder.Services.Configure<FormOptions>(options =>
@@ -71,10 +56,12 @@ builder.Services.Configure<FormOptions>(options =>
 // Adding CORS policy 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowBlazorClient",
-        policy => policy.WithOrigins("https://localhost:5000") // Blazor client port
-                       .AllowAnyMethod()
-                       .AllowAnyHeader());
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+             .AllowAnyMethod()
+             .AllowAnyHeader();
+    });
 });
 
 builder.Services.AddControllers()
@@ -82,7 +69,39 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        ClockSkew = TimeSpan.FromMinutes(1) // Allow 1 minute clock skew
+    };
 
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine($"Authentication failed: {context.Exception}");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("Token validated successfully");
+            return Task.CompletedTask;
+        }
+    };
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -117,6 +136,7 @@ builder.Services.AddSwaggerGen(c =>
             new List<string>()
         }
     });
+    c.OperationFilter<AuthResponsesOperationFilter>();
 });
 
 
@@ -143,9 +163,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Add CORS middleware 
+// Must be in this exact order:
 app.UseRouting();
-app.UseCors("AllowBlazorClient"); // This enables the CORS policy
+app.UseCors("AllowAll");
+app.UseAuthentication();  // This must come before Authorization
 app.UseAuthorization();
 
 app.MapControllers();
