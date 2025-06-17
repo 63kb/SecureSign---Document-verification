@@ -120,18 +120,28 @@ namespace Core.Api.Controllers
         }
 
         [HttpGet("{id}/download")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Download(int id)
         {
             try
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                _logger.LogInformation("Download attempt for document {DocumentId} by user {UserId}", id, userId);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    _logger.LogWarning("Unauthorized download attempt - no user ID in claims");
+                    return Unauthorized("Authentication required");
+                }
+
                 var document = await _context.Documents
                     .FirstOrDefaultAsync(d => d.Id == id && d.UserId == userId);
 
                 if (document == null)
                 {
                     _logger.LogWarning("Document {DocumentId} not found or access denied for user {UserId}", id, userId);
-                    return NotFound();
+                    return NotFound("Document not found or access denied");
                 }
 
                 return File(document.Content, document.ContentType, document.FileName);
@@ -195,6 +205,7 @@ namespace Core.Api.Controllers
                 document.Description,
                 document.Category,
                 User = new
+                
                 {
                     Id = user.Id,
                     UserName = user.UserName,

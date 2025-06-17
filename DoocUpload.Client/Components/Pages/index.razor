@@ -1,0 +1,41 @@
+﻿@page "/"  
+@using MatBlazor  
+
+<div class="hero-section">  
+    <div class="hero-content">  
+        <div class="app-logo">  
+            <MatIcon Icon="@MatIconNames.Check" Style="font-size: 64px; color: #4285F4;" />  
+            <h1>DocVerify</h1>  
+        </div>  
+        <h2 class="hero-subtitle">Trusted Document Verification</h2>  
+        <p class="hero-description">  
+            Secure document management with blockchain-level verification.  
+            Upload, scan, and verify authenticity in three simple steps.  
+        </p>  
+        <div class="cta-buttons">  
+            <MatButton Href="/login" Label="Get Started" Raised="true" Class="primary-btn" />  
+            <MatButton Href="#features" Label="How It Works" Outlined="true" Class="secondary-btn" />  
+        </div>  
+    </div>  
+</div>  
+
+<div class="features-section" id="features">  
+    <h3 class="section-title">How DocVerify Works</h3>  
+    <div class="feature-cards">  
+        <div class="feature-card">  
+            <MatIcon Icon="@MatIconNames.Cloud" Style="font-size: 48px; color: #4285F4;" />  
+            <h4>Upload</h4>  
+            <p>Securely upload your documents with end-to-end encryption</p>  
+        </div>  
+        <div class="feature-card">  
+            <MatIcon Icon="@MatIconNames.Code" Style="font-size: 48px; color: #34A853;" />  
+            <h4>Scan</h4>  
+            <p>Generate unique QR codes for document verification</p>  
+        </div>  
+        <div class="feature-card">  
+            <MatIcon Icon="@MatIconNames.Check" Style="font-size: 48px; color: #EA4335;" />  
+            <h4>Verify</h4>  
+            <p>Instantly confirm document authenticity</p>  
+        </div>  
+    </div>  
+</div>

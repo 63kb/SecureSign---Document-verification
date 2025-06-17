@@ -15,8 +15,7 @@ namespace DataAccess.models
         public required string Password { get; set; }
 
         [Required(ErrorMessage = "Confirmation password is required")]
-        [Compare("Password", ErrorMessage = "Passwords don't match")]
-        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "Passwords don't match")]        [DataType(DataType.Password)]
         public required string ConfirmPassword { get; set; }
     }
 

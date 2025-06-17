@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Api", "Core.Api\Core.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{2285D8D9-322C-4F68-B0EE-14518603ABC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentUpload.Client", "DocumentUpload.Client\DocumentUpload.Client.csproj", "{792F2645-AC21-49C9-8125-310A3DE82926}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoocUpload.Client", "DoocUpload.Client\DoocUpload.Client.csproj", "{8E77B2E4-D5C3-48AE-BAA9-5D0B1DA9CB95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2285D8D9-322C-4F68-B0EE-14518603ABC7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{792F2645-AC21-49C9-8125-310A3DE82926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{792F2645-AC21-49C9-8125-310A3DE82926}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{792F2645-AC21-49C9-8125-310A3DE82926}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{792F2645-AC21-49C9-8125-310A3DE82926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E77B2E4-D5C3-48AE-BAA9-5D0B1DA9CB95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E77B2E4-D5C3-48AE-BAA9-5D0B1DA9CB95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E77B2E4-D5C3-48AE-BAA9-5D0B1DA9CB95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E77B2E4-D5C3-48AE-BAA9-5D0B1DA9CB95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

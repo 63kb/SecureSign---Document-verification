@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Security.Claims;
 using System.Text;
 
 // ... (previous using statements remain the same)
@@ -72,7 +73,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
@@ -85,24 +85,22 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-        ClockSkew = TimeSpan.Zero // Consider setting to zero for stricter validation
+        // Set to zero for strict expiration validation
+        ClockSkew = TimeSpan.Zero,
+        // Ensure NameIdentifier claim is mapped
+        NameClaimType = ClaimTypes.NameIdentifier
     };
 
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
         {
-            Console.WriteLine($"Authentication failed: {context.Exception}");
+            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
             return Task.CompletedTask;
         },
         OnTokenValidated = context =>
         {
-            Console.WriteLine("Token validated successfully");
-            return Task.CompletedTask;
-        },
-        OnForbidden = context =>
-        {
-            Console.WriteLine($"Forbidden: {context.HttpContext.Request.Path}");
+            Console.WriteLine($"Token validated for user: {context.Principal.Identity.Name}");
             return Task.CompletedTask;
         }
     };
