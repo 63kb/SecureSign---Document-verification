@@ -93,7 +93,7 @@ namespace Core.Api.Controllers
                     Size = file.Length,
                     Content = memoryStream.ToArray(),
                     UserId = userId,
-                    Description = description,
+                    Description = description??"no_description",
                     Category = category,
                     UploadDate = DateTime.UtcNow
                 };
