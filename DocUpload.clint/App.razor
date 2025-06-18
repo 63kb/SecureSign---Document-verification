@@ -1,0 +1,27 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization  
+@using DocUpload.clint.Shared  
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <!-- Bypass auth for the root path ("/") -->
+            @if (routeData.PageType?.FullName?.Contains("Pages.Index") ?? false)
+            {
+                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            }
+            else
+            {
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <NotAuthorized>
+                        <p>Please <a href="/login">login</a> to access this page.</p>
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+            }
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Page not found</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

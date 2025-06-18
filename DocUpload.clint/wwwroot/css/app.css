@@ -1,0 +1,119 @@
+/* Google-inspired theme with Poppins font */
+:root {
+    --primary: #4285F4; /* Google Blue */
+    --secondary: #34A853; /* Google Green */
+    --accent: #EA4335; /* Google Red */
+    --warning: #FBBC05; /* Google Yellow */
+    --light: #f8f9fa;
+    --dark: #3c4043;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar & Hero Section */
+.navbar-brand {
+    font-weight: 600;
+    color: var(--primary) !important;
+}
+
+.hero-section {
+    min-height: 80vh;
+    background: var(--light);
+    display: flex;
+    align-items: center;
+}
+
+/* Feature Icons */
+.feature-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn-primary {
+    background: var(--primary);
+    border: none;
+}
+
+    .btn-primary:hover {
+        background: #3367d6;
+    }
+
+.navbar {
+    padding: 0.8rem 1rem;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+}
+.document-icon {
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+    .document-icon:hover {
+        transform: scale(1.05) rotate(-2deg);
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    }
+.hero-section {
+    background-color: white;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+}
+.signing-illustration {
+    width: 220px;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.1));
+    transition: transform 0.3s ease;
+}
+
+  
+
+.signing-hand {
+    animation: signing-motion 2s infinite alternate ease-in-out;
+    transform-origin: 70% 70%;
+}
+
+
+
+.signature-line {
+    animation: line-grow 1.5s forwards;
+}
+
+@keyframes line-grow {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+:root {
+    --google-blue: #4285F4;
+    --google-red: #EA4335;
+    --google-yellow: #FBBC05;
+    --google-green: #34A853;
+    --google-grey-100: #f8f9fa;
+    --google-grey-700: #5f6368;
+    --google-grey-900: #202124;
+}
+
+.btn-google-blue {
+    background: var(--google-blue);
+    color: white;
+    border: 2px solid transparent;
+}
+
+    .btn-google-blue:hover {
+        background: white;
+        color: var(--google-blue);
+        border-color: var(--google-blue);
+    }

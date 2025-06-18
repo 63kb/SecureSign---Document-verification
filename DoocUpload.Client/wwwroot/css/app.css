@@ -1,4 +1,4 @@
-h1:focus {
+/*h1:focus {
     outline: none;
 }
 
@@ -26,103 +26,57 @@ h1:focus {
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
-}
-/* Google-inspired color palette */
-/* Google Material Design Colors */
+}*/
+/* Import Poppins font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 :root {
-    --primary: #4285F4;
-    --secondary: #34A853;
-    --accent: #EA4335;
-    --text: #3c4043;
-    --background: #FFFFFF;
-    --gray: #F1F3F4;
-    --shadow: 0 2px 10px rgba(0,0,0,0.1);
+    --primary-color: #4285F4; /* Google blue */
+    --secondary-color: #34A853; /* Google green */
+    --accent-color: #EA4335; /* Google red */
+    --warning-color: #FBBC05; /* Google yellow */
+    --light-gray: #f8f9fa;
+    --dark-gray: #3c4043;
 }
 
-/* Base Styles */
 body {
-    font-family: 'Google Sans', Roboto, sans-serif;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
-    color: var(--text);
-    line-height: 1.6;
+    padding: 0;
+    color: var(--dark-gray);
 }
 
-/* Hero Section */
+/* Utility classes */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+    .btn-primary:hover {
+        background-color: #3367d6;
+        border-color: #3367d6;
+    }
+
 .hero-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9f0ff 100%);
-    padding: 5rem 2rem;
-    text-align: center;
-    min-height: 60vh;
+    min-height: 80vh;
     display: flex;
     align-items: center;
-    justify-content: center;
+    background-color: var(--light-gray);
 }
 
-.hero-content {
-    max-width: 800px;
-    margin: 0 auto;
+.feature-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
 }
-
-.app-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-    .app-logo h1 {
-        font-size: 3.5rem;
-        color: var(--primary);
-        font-weight: 500;
-        margin: 0;
-    }
-
-.hero-subtitle {
-    font-size: 1.8rem;
-    color: var(--text);
-    margin-bottom: 1.5rem;
-    font-weight: 400;
-}
-
-/* Feature Cards */
-.features-section {
-    padding: 4rem 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.section-title {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 3rem;
-    color: var(--primary);
-}
-
-.feature-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-}
-
-.feature-card {
-    background: var(--background);
-    border-radius: 8px;
-    padding: 2.5rem 2rem;
-    text-align: center;
-    box-shadow: var(--shadow);
-    transition: transform 0.3s ease;
-}
-
-    .feature-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .feature-card h4 {
-        font-size: 1.5rem;
-        margin: 1.5rem 0 1rem;
-    }
-
 /* Buttons */
 .primary-btn {
     background-color: var(--primary) !important;

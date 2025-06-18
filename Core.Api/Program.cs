@@ -51,14 +51,11 @@ builder.Services.Configure<FormOptions>(options =>
 });
 
 // Configure CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-             .AllowAnyMethod()
-             .AllowAnyHeader();
-    });
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll", builder =>
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader());
 });
 
 // Configure Controllers
@@ -139,7 +136,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
+app.UseRouting();
+app.UseCors("AllowAll");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -151,13 +149,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); 
 
-// Critical: These middleware must be in exact order
-app.UseRouting();
-app.UseCors("AllowAll");
+// Correct method call syntax
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
