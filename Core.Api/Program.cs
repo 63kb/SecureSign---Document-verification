@@ -9,10 +9,12 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 // ... (previous using statements remain the same)
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,11 +53,16 @@ builder.Services.Configure<FormOptions>(options =>
 });
 
 // Configure CORS
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAll", builder =>
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader());
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:5001") // Your Blazor app's URL
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
 });
 
 // Configure Controllers
@@ -136,6 +143,20 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+app.Use(async (context, next) =>
+{
+    var originalBody = context.Response.Body;
+    using var memoryStream = new MemoryStream();
+    context.Response.Body = memoryStream;
+
+    await next();
+
+    memoryStream.Seek(0, SeekOrigin.Begin);
+    var responseBody = new StreamReader(memoryStream).ReadToEnd();
+    Console.WriteLine($"Response: {responseBody}"); // Inspect this output
+    memoryStream.Seek(0, SeekOrigin.Begin);
+    await memoryStream.CopyToAsync(originalBody);
+});
 app.UseRouting();
 app.UseCors("AllowAll");
 // Configure the HTTP request pipeline.
@@ -148,11 +169,22 @@ if (app.Environment.IsDevelopment())
         c.DisplayRequestDuration();
     });
 }
-
+// Add this after UseRouting() but before UseAuthorization()
+app.Use(async (context, next) =>
+{
+    var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+    if (!string.IsNullOrEmpty(token))
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        var identity = new ClaimsIdentity(jwtToken.Claims, "Bearer");
+        context.User = new ClaimsPrincipal(identity);
+    }
+    await next();
+});
 app.UseHttpsRedirection(); 
-
-// Correct method call syntax
 app.UseAuthentication();
+app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 
 

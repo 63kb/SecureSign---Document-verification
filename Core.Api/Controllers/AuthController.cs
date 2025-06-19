@@ -49,23 +49,28 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByEmailAsync(model.Email);
         var token = GenerateJwtToken(user);
 
-        return Ok(new { Token = token });
+        return Ok(new { 
+            IsSuccess = true,
+            Token = token,
+            UserId = user.Id,
+            Email = user.Email
+        });
     }
 
     [HttpGet("validate")]
     [Authorize]
     public IActionResult ValidateToken()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var email = User.FindFirstValue(ClaimTypes.Email);
+        // Ensure the token hasn't expired
+        var expiryClaim = User.FindFirst(JwtRegisteredClaimNames.Exp);
+        if (expiryClaim == null || !long.TryParse(expiryClaim.Value, out var expiryTime))
+            return Unauthorized("Invalid token");
 
-        return Ok(new
-        {
-            UserId = userId,
-            Email = email,
-            Message = "Token is valid",
-            Claims = User.Claims.Select(c => new { c.Type, c.Value })
-        });
+        var expiryDate = DateTimeOffset.FromUnixTimeSeconds(expiryTime).UtcDateTime;
+        if (expiryDate < DateTime.UtcNow)
+            return Unauthorized("Token expired");
+
+        return Ok(new { UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) });
     }
 
     private string GenerateJwtToken(ApplicationUser user)

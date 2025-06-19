@@ -1,0 +1,83 @@
+﻿@page "/register"
+@using System.ComponentModel.DataAnnotations
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="auth-container">
+    <h2>Register</h2>
+    <EditForm Model="@model" OnValidSubmit="@HandleRegister">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Email</label>
+            <InputText @bind-Value="model.Email" class="form-control" />
+            <ValidationMessage For="@(() => model.Email)" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <InputText type="password" @bind-Value="model.Password" class="form-control" />
+            <ValidationMessage For="@(() => model.Password)" />
+        </div>
+        <div class="form-group">
+            <label>Confirm Password</label>
+            <InputText type="password" @bind-Value="model.ConfirmPassword" class="form-control" />
+            <ValidationMessage For="@(() => model.ConfirmPassword)" />
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+    </EditForm>
+
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger mt-3">@errorMessage</div>
+    }
+</div>
+
+@code {
+    private RegisterModel model = new();
+    private string errorMessage;
+
+    private async Task HandleRegister()
+    {
+        errorMessage = null;
+
+        try
+        {
+            var response = await AuthService.Register(model);
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                var error = await response.Content.ReadFromJsonAsync<ApiError>();
+                errorMessage = error?.Message ?? "Registration failed";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An error occurred during registration";
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public class RegisterModel
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Password is required")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters")]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "Please confirm your password")]
+        [Compare(nameof(Password), ErrorMessage = "Passwords do not match")]
+        public string ConfirmPassword { get; set; }
+    }
+
+    public class ApiError
+    {
+        public string Message { get; set; }
+    }
+}

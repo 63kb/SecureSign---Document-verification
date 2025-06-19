@@ -1,27 +1,28 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization  
 @using DocUpload.clint.Shared  
+@inject NavigationManager NavigationManager  
 
-<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
-        <Found Context="routeData">
-            <!-- Bypass auth for the root path ("/") -->
-            @if (routeData.PageType?.FullName?.Contains("Pages.Index") ?? false)
-            {
-                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-            }
-            else
-            {
-                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                    <NotAuthorized>
-                        <p>Please <a href="/login">login</a> to access this page.</p>
-                    </NotAuthorized>
-                </AuthorizeRouteView>
-            }
-        </Found>
-        <NotFound>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p>Page not found</p>
-            </LayoutView>
-        </NotFound>
-    </Router>
+<CascadingAuthenticationState>  
+    <Router AppAssembly="@typeof(App).Assembly">  
+        <Found Context="routeData">  
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">  
+                <NotAuthorized>  
+                    @if (context?.User?.Identity?.IsAuthenticated != true)  
+                    {  
+                        <p>Redirecting to login...</p>  
+                        NavigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}");  
+                    }  
+                    else  
+                    {  
+                        <p>Access denied.</p>  
+                    }  
+                </NotAuthorized>  
+            </AuthorizeRouteView>  
+        </Found>  
+        <NotFound>  
+            <LayoutView Layout="@typeof(MainLayout)">  
+                <p>Not found</p>  
+            </LayoutView>  
+        </NotFound>  
+    </Router>  
 </CascadingAuthenticationState>

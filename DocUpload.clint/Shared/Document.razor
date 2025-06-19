@@ -1,0 +1,48 @@
+﻿@page "/documents"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject HttpClient Http
+
+<h3>Your Documents</h3>
+
+@if (documents == null)
+{
+    <p>Loading...</p>
+}
+else if (!documents.Any())
+{
+    <p>No documents found</p>
+}
+else
+{
+    <table class="table">
+        <!-- Document listing -->
+    </table>
+}
+
+@code {
+    private List<DocumentDto> documents = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            documents = await Http.GetFromJsonAsync<List<DocumentDto>>("api/documents");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading documents: {ex.Message}");
+        }
+    }
+
+    public class DocumentDto
+    {
+        public int Id { get; set; }
+        public string FileName { get; set; }
+        public string ContentType { get; set; }
+        public long Size { get; set; }
+        public DateTime UploadDate { get; set; }
+        public string Description { get; set; }
+        public string Category { get; set; }
+    }
+}

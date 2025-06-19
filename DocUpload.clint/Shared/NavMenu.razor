@@ -32,8 +32,38 @@
             </ul>
         </div>
     </div>
+    <AuthorizeView>
+    <Authorized>
+        <li class="nav-item">
+            <a class="nav-link" href="/documents">My Documents</a>
+        </li>
+        <li class="nav-item">
+            <button class="btn btn-link nav-link" @onclick="Logout">Logout</button>
+        </li>
+    </Authorized>
+    <NotAuthorized>
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+        </li>
+        <li class="nav-item ms-2">
+            <a class="btn btn-primary" href="/register">Register</a>
+        </li>
+    </NotAuthorized>
+</AuthorizeView>
+
+
 </nav>
 
+@code {
+    [Inject] private AuthService AuthService { get; set; }
+    [Inject] private NavigationManager Navigation { get; set; }
+
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        Navigation.NavigateTo("/");
+    }
+}
 @code {
     private bool collapseNavMenu = true;
     private string NavMenuCssClass => collapseNavMenu ? "collapse navbar-collapse" : "navbar-collapse";
