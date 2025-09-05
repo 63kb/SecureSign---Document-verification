@@ -24,7 +24,7 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    return null // Will redirect to login
+    return null 
   }
 
   return <Dashboard />
