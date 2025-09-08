@@ -13,17 +13,6 @@ Designed for organizations that require **authenticity, integrity, and traceabil
 - Modern stack: ASP.NET Core backend + React/Next.js frontend  
 
 ---
-
-## Project Structure
-
-docsupload/
-│── backend/ # ASP.NET Core Web API
-│── frontend/ # React/Next.js user interface
-│── images/ # Project screenshots & diagrams
-│── README.md
-
----
-
 ## Getting Started
 
 ### 1. Clone Repository
